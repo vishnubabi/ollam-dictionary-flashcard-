@@ -1,0 +1,22 @@
+<h1>English-Malayalam Dictionary</h1>
+
+<form method="get" action="">
+    <input type="text" name="q" placeholder="Search English word..." value="{{ request.GET.q }}" style="padding:8px; width:300px;">
+    <button type="submit">🔍 Search</button>
+</form>
+
+<hr>
+<h1>hiiiiiiiiiiiiiiiiiiiiii</h1>
+<h2>Search Results:</h2>
+
+<ul>
+    {% for entry in entries %}
+        <li>
+            <strong>{{ entry.from_content }}</strong>
+            {% if entry.types %} <em>({{ entry.types }})</em> {% endif %}
+            → <span style="color:green;">{{ entry.to_content }}</span>
+        </li>
+    {% empty %}
+        <li>No results found.</li>
+    {% endfor %}
+</ul>
