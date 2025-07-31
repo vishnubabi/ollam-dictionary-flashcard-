@@ -17,12 +17,20 @@
         <div class="search-box">
             <h2 class="mb-4 text-center">📚 Malayalam Dictionary</h2>
 
-            <form method="get" class="mb-4 d-flex">
-                <input type="text" name="q" class="form-control form-control-lg flex-grow-1" placeholder="Search English word..." value="{{ request.GET.q }}">
-                <button type="submit" class="btn btn-primary ms-2">Search</button> 
-                <button type="submit" class="btn btn-primary ms-2">Search</button>
-
+            <form method="get" class="mb-4 d-flex gap-2 align-items-center">
+                <input 
+                    type="text" 
+                    name="q" 
+                    class="form-control form-control-lg" 
+                    placeholder="Search English word..." 
+                    value="{{ request.GET.q }}"
+                >
+                <button type="submit" class="btn btn-primary">Search</button>
+                <a href="{% url 'flashcard_home' %}" class="btn btn-secondary">Flashcard</a>
             </form>
+
+
+
 
             {% if entries %}
                 {% for entry in entries %}
