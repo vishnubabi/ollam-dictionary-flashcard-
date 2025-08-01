@@ -29,19 +29,32 @@
                 <a href="{% url 'flashcard_home' %}" class="btn btn-secondary">Flashcard</a>
             </form>
 
+            {% if query %}
+                {% if exact_match %}
+                    <h4 class="mb-3">🔍 Exact Match</h4>
+                    {% for entry in exact_match %}
+                        <div class="entry mb-3 p-3 border rounded">
+                            <div class="fw-bold fs-5">{{ entry.from_content }}</div>
+                            <div class="text-muted">({{ entry.types|cut:"{"|cut:"}" }})</div>
+                            <div>{{ entry.to_content }}</div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
 
-
-
-            {% if entries %}
-                {% for entry in entries %}
-                    <div class="entry">
-                        <div class="word">{{ entry.from_content }}</div>
-                        <div class="type">{{ entry.types }}</div>
-                        <div class="meaning">{{ entry.to_content }}</div>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p class="text-center text-muted">No results found.</p>
+                {% if related_matches %}
+                    <h4 class="mt-4 mb-3">📌 Related Words</h4>
+                    {% for entry in related_matches %}
+                        <div class="entry mb-3 p-3 border rounded">
+                            <div class="fw-bold">{{ entry.from_content }}</div>
+                            <div class="text-muted">({{ entry.types|cut:"{"|cut:"}" }})</div>
+                            <div>{{ entry.to_content }}</div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    {% if not exact_match %}
+                        <p class="text-center text-muted">No results found.</p>
+                    {% endif %}
+                {% endif %}
             {% endif %}
         </div>
     </div>

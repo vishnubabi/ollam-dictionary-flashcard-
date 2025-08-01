@@ -4,27 +4,43 @@ from django.core.management.base import BaseCommand
 from dictionary_app.models import DictionaryEntry
 
 class Command(BaseCommand):
-    help = 'Import Olam dictionary data from TSV file'
+    help = 'Import Olam dataset from TSV file'
 
     def handle(self, *args, **kwargs):
-        file_path = 'data/olam_data.tsv'  # ✅ Use this if you're running from malayalam_english directory
+        print("⚡ import_ollam command started...")
 
-        print(f"🛠 Trying to open: {file_path}")
+        file_path = 'data/olam_data.tsv'
 
+        # Check if file exists
         if not os.path.exists(file_path):
-            self.stdout.write(self.style.ERROR(f"❌ File not found: {file_path}"))
+            print(f"❌ File not found at: {file_path}")
             return
+        else:
+            print(f"📂 File found: {file_path}")
+
+        count = 0
 
         try:
-            with open(file_path, 'r', encoding='utf-8') as tsvfile:
+            with open(file_path, newline='', encoding='utf-8') as tsvfile:
                 reader = csv.DictReader(tsvfile, delimiter='\t', fieldnames=['from_content', 'types', 'to_content'])
-                count = 0
-                for row in reader:
-                    DictionaryEntry.objects.create(**row)
-                    count += 1
-                    if count % 1000 == 0:
-                        print(f"Imported {count} entries...")
 
-            self.stdout.write(self.style.SUCCESS(f"✅ Successfully imported {count} dictionary entries."))
+                for row in reader:
+                    from_word = row['from_content'].strip()
+                    word_type = row['types'].strip().replace("{", "").replace("}", "")  # Remove curly braces
+                    meaning = row['to_content'].strip()
+
+                    DictionaryEntry.objects.create(
+                        from_content=from_word,
+                        types=word_type,
+                        to_content=meaning
+                    )
+                    count += 1
+
+                    # Optional: Show progress every 100 entries
+                    if count % 100 == 0:
+                        print(f"✅ Imported {count} entries...")
+
+            print(f"🎉 Finished importing {count} entries!")
+
         except Exception as e:
-            self.stdout.write(self.style.ERROR(f"❌ Error occurred: {e}"))
+            print(f"❌ Error during import: {e}")

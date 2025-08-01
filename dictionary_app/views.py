@@ -1,16 +1,21 @@
 from django.shortcuts import render
 from .models import DictionaryEntry
+
 def dictionary_list(request):
     query = request.GET.get('q')
+    exact_match = []
+    related_matches = []
+
     if query:
-        entries = DictionaryEntry.objects.filter(from_content__icontains=query)
-    else:
-        entries = DictionaryEntry.objects.all()[:100]
+        # Exact match first
+        exact_match = DictionaryEntry.objects.filter(from_content__iexact=query)
 
-    print(f"Query: {query} | Found: {entries.count()}")
+        # Related words that *contain* query but not exactly equal
+        related_matches = DictionaryEntry.objects.filter(from_content__icontains=query).exclude(from_content__iexact=query).order_by('from_content')
 
-    # 👇 Temporary debug output
-    for entry in entries[:1]:
-        print(entry.from_content, "→", entry.to_content)
-
-    return render(request, 'dictionary_app/dictionary_list.html', {'entries': entries})
+    context = {
+        'query': query,
+        'exact_match': exact_match,
+        'related_matches': related_matches,
+    }
+    return render(request, 'dictionary_app/dictionary_list.html', context)
