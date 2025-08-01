@@ -30,19 +30,22 @@
             </form>
 
             {% if query %}
-                {% if exact_match %}
-                    <h4 class="mb-3">🔍 Exact Match</h4>
-                    {% for entry in exact_match %}
-                        <div class="entry mb-3 p-3 border rounded">
-                            <div class="fw-bold fs-5">{{ entry.from_content }}</div>
-                            <div class="text-muted">({{ entry.types|cut:"{"|cut:"}" }})</div>
-                            <div>{{ entry.to_content }}</div>
+                {% if grouped_exact %}
+                    <h4 class="mb-3 text-center">🔍 Results for: <strong>{{ query }}</strong></h4>
+                    {% for type_label, meanings in grouped_exact.items %}
+                        <div class="entry mb-4 p-3 border rounded bg-light">
+                            <div class="fw-bold text-primary">{{ type_label }}</div>
+                            <ul class="mt-2 mb-0">
+                                {% for meaning in meanings %}
+                                    <li>{{ meaning }}</li>
+                                {% endfor %}
+                            </ul>
                         </div>
                     {% endfor %}
                 {% endif %}
 
                 {% if related_matches %}
-                    <h4 class="mt-4 mb-3">📌 Related Words</h4>
+                    <h4 class="mt-5 mb-3">📌 Related Words</h4>
                     {% for entry in related_matches %}
                         <div class="entry mb-3 p-3 border rounded">
                             <div class="fw-bold">{{ entry.from_content }}</div>
@@ -51,7 +54,7 @@
                         </div>
                     {% endfor %}
                 {% else %}
-                    {% if not exact_match %}
+                    {% if not grouped_exact %}
                         <p class="text-center text-muted">No results found.</p>
                     {% endif %}
                 {% endif %}
