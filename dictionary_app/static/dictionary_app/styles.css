@@ -100,3 +100,8 @@ form a.btn-secondary:hover {
         width: 100%;
     }
 }
+
+/* ----- query result (add ...result... to flashcard)  ----- */
+.blue-text {
+    color: blue;
+}

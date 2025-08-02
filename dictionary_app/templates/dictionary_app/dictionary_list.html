@@ -31,7 +31,16 @@
 
             {% if query %}
                 {% if grouped_exact %}
-                    <h4 class="mb-3 text-center">🔍 Results for: <strong>{{ query }}</strong></h4>
+                <h4 class="mb-3 d-flex align-items-center justify-content-center">
+                    <div>
+                        Add <strong class="blue-text">{{ query }}</strong> to flashcard
+                    </div>
+                    <button type="button" class="btn btn-primary btn-lg ms-5">Add</button>
+                </h4>   
+                <div class="entry mb-4 p-3 border rounded bg-light">
+                </div>
+
+
                     {% for type_label, meanings in grouped_exact.items %}
                         <div class="entry mb-4 p-3 border rounded bg-light">
                             <div class="fw-bold text-primary">{{ type_label }}</div>
