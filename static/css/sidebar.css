@@ -1,0 +1,26 @@
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #f8f9fa;
+    padding: 1rem;
+    width: auto;
+    min-width: max-content;
+    border-right: 1px solid #dee2e6;
+    z-index: 1000;
+}
+
+body.dark-mode {
+    background-color: #121212;
+    color: #f1f1f1;
+}
+
+body.dark-mode .sidebar {
+    background-color: #1e1e1e;
+    border-color: #333;
+}
+
+body.dark-mode a {
+    color: #f1f1f1 !important;
+}
