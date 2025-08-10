@@ -30,6 +30,9 @@ html, body {
   transform-style: preserve-3d;
   transition: transform 0.7s cubic-bezier(0.5,0.6,0.4,1);
   position: relative;
+  /* Make height responsive to content */
+  height: auto;
+  min-height: fit-content;
 }
 
 .card.flipped {
@@ -48,6 +51,9 @@ html, body {
   box-sizing: border-box;
   left: 0;
   top: 0;
+  /* Allow content to expand height */
+  min-height: 220px;
+  height: auto;
 }
 
 .card-front {
@@ -64,11 +70,21 @@ html, body {
   color: #1a1a1a;
   line-height: 1.5;
   margin: 0;
+  /* Allow text to wrap and expand */
+  word-wrap: break-word;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .answer {
   color: #4C566A;
   font-weight: 500;
+  /* Allow Malayalam text to be larger if needed */
+  font-size: 1.1rem;
+  padding: 10px 0;
 }
 
 /* Buttons */
@@ -82,7 +98,7 @@ html, body {
   gap: 14px;
 }
 
-button {
+button, .btn {
   background: #f4f4f4;
   color: #111;
   font: inherit;
@@ -93,10 +109,18 @@ button {
   cursor: pointer;
   transition: background 0.12s;
   letter-spacing: 0.01em;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
 }
 
-button:active {
+button:active, .btn:active {
   background: #e0e0e0;
+}
+
+.btn-primary {
+  background: #007bff !important;
+  color: white !important;
 }
 
 .multi-buttons {
@@ -109,7 +133,7 @@ button:active {
   margin: 0 6px;
 }
 
-/* Responsive */
+/* Responsive adjustments for longer content */
 @media (max-width: 480px) {
   .card {
     min-height: 170px;
@@ -118,14 +142,31 @@ button:active {
 
   .card-face {
     padding: 20px 10px 64px 10px;
+    min-height: 170px;
   }
 
   .card-buttons {
     padding: 14px;
   }
 
-  button {
+  button, .btn {
     font-size: 0.95rem;
     padding: 10px 8px;
+  }
+  
+  .question, .answer {
+    font-size: 1.1rem;
+  }
+  
+  .answer {
+    font-size: 1rem;
+  }
+}
+
+/* Handle very long Malayalam text */
+@media (max-height: 600px) {
+  .answer {
+    font-size: 1rem;
+    line-height: 1.4;
   }
 }

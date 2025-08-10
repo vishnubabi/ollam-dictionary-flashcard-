@@ -1,6 +1,11 @@
 from django.shortcuts import render
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from .models import DictionaryEntry
+from flashcard_app.models import Flashcard
 from collections import defaultdict
+import json
 
 def dictionary_list(request):
     query = request.GET.get('q')
@@ -37,3 +42,20 @@ def dictionary_list(request):
         'related_matches': related_matches,
     }
     return render(request, 'dictionary_app/dictionary_list.html', context)
+
+@require_POST
+def add_flashcard(request):
+    try:
+        english_word = request.POST.get('english_word')
+        malayalam_meaning = request.POST.get('malayalam_meaning')
+        
+        # Check if flashcard already exists
+        if not Flashcard.objects.filter(english_word=english_word).exists():
+            Flashcard.objects.create(
+                english_word=english_word,
+                malayalam_meaning=malayalam_meaning
+            )
+        
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})

@@ -37,11 +37,11 @@
                     <div>
                         Add <strong class="blue-text">{{ query }}</strong> to flashcard
                     </div>
-                    <button type="button" class="btn btn-primary btn-lg ms-5">Add</button>
+                    <button type="button" id="add-flashcard-btn" class="btn btn-primary btn-lg ms-5" 
+                            data-english="{{ query }}" data-malayalam="{% for type_label, meanings in grouped_exact.items %}{{ type_label }}: {% for meaning in meanings %}{{ meaning }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.last %} | {% endif %}{% endfor %}">
+                        Add
+                    </button>
                 </h4>   
-                <div class="entry mb-4 p-3 border rounded bg-light">
-                </div>
-
 
                     {% for type_label, meanings in grouped_exact.items %}
                         <div class="entry mb-4 p-3 border rounded bg-light">
@@ -72,5 +72,38 @@
             {% endif %}
         </div>
     </div>
+
+    <!-- Include jQuery for AJAX -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#add-flashcard-btn').click(function() {
+                var button = $(this);
+                var englishWord = button.data('english');
+                var malayalamMeaning = button.data('malayalam');
+                
+                $.ajax({
+                    url: '{% url "add_flashcard" %}',
+                    type: 'POST',
+                    data: {
+                        'english_word': englishWord,
+                        'malayalam_meaning': malayalamMeaning,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Change button to green and text to "Added"
+                            button.removeClass('btn-primary').addClass('btn-success');
+                            button.text('Added ✓');
+                            button.prop('disabled', true);
+                        }
+                    },
+                    error: function() {
+                        alert('Error adding flashcard. Please try again.');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
