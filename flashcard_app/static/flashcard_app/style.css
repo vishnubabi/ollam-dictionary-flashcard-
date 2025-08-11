@@ -1,172 +1,259 @@
-/* Body & container */
-html, body {
-  height: 100%;
-  margin: 0;
-  font-family: 'Inter', Arial, sans-serif;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Flashcard Dark Mode Variables */
+:root {
+    --flashcard-bg-front: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --flashcard-bg-back: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --flashcard-text: white;
+    --button-bg: rgba(255,255,255,0.2);
+    --button-border: rgba(255,255,255,0.3);
+    --button-hover-bg: rgba(255,255,255,0.3);
+    --card-shadow: rgba(0,0,0,0.15);
 }
 
+.dark-mode {
+    --flashcard-bg-front: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+    --flashcard-bg-back: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    --flashcard-text: #e2e8f0;
+    --button-bg: rgba(226, 232, 240, 0.2);
+    --button-border: rgba(226, 232, 240, 0.3);
+    --button-hover-bg: rgba(226, 232, 240, 0.3);
+    --card-shadow: rgba(0,0,0,0.4);
+}
+
+/* Flashcard Container */
 .flashcard-container {
-  perspective: 1200px;
-  width: 100vw;
-  display: flex;
-  justify-content: center;
+    perspective: 1200px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 2rem);
+    padding: 2rem 1rem;
 }
 
-/* Card styling */
+/* Card Styling */
 .card {
-  width: 90vw;
-  max-width: 450px;
-  min-height: 220px;
-  background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 4px 32px rgba(0,0,0,0.07), 0 1.5px 5px rgba(0,0,0,0.03);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transform-style: preserve-3d;
-  transition: transform 0.7s cubic-bezier(0.5,0.6,0.4,1);
-  position: relative;
-  /* Make height responsive to content */
-  height: auto;
-  min-height: fit-content;
+    width: 90vw;
+    max-width: 500px;
+    min-height: 350px;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px var(--card-shadow);
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    border: none;
 }
 
 .card.flipped {
-  transform: rotateY(180deg);
+    transform: rotateY(180deg);
 }
 
+/* Card Faces */
 .card-face {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 32px 24px 80px 24px;
-  box-sizing: border-box;
-  left: 0;
-  top: 0;
-  /* Allow content to expand height */
-  min-height: 220px;
-  height: auto;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 2rem;
+    box-sizing: border-box;
+    border-radius: 24px;
+    min-height: 350px;
 }
 
 .card-front {
-  z-index: 2;
+    background: var(--flashcard-bg-front);
+    color: var(--flashcard-text);
 }
 
 .card-back {
-  transform: rotateY(180deg);
+    background: var(--flashcard-bg-back);
+    color: var(--flashcard-text);
+    transform: rotateY(180deg);
 }
 
-/* Text */
+/* Card Header */
+.card-header {
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    opacity: 0.8;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+/* Question and Answer Text */
 .question, .answer {
-  font-size: 1.25rem;
-  color: #1a1a1a;
-  line-height: 1.5;
-  margin: 0;
-  /* Allow text to wrap and expand */
-  word-wrap: break-word;
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1.4;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    color: var(--flashcard-text) !important;
+    padding: 1rem 0;
+    word-wrap: break-word;
+    hyphens: auto;
 }
 
 .answer {
-  color: #4C566A;
-  font-weight: 500;
-  /* Allow Malayalam text to be larger if needed */
-  font-size: 1.1rem;
-  padding: 10px 0;
+    font-size: 1.5rem;
+    font-weight: 600;
 }
 
-/* Buttons */
+/* Button Styles */
 .card-buttons {
-  position: absolute;
-  bottom: 0;
-  left: 0; right: 0;
-  padding: 24px;
-  display: flex;
-  justify-content: center;
-  gap: 14px;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
 }
 
-button, .btn {
-  background: #f4f4f4;
-  color: #111;
-  font: inherit;
-  border: none;
-  border-radius: 14px;
-  padding: 10px 18px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.12s;
-  letter-spacing: 0.01em;
-  text-decoration: none;
-  display: inline-block;
-  text-align: center;
+.card-buttons button {
+    background: var(--button-bg);
+    color: var(--flashcard-text) !important;
+    border: 2px solid var(--button-border);
+    border-radius: 25px;
+    padding: 0.8rem 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-width: 100px;
+    text-shadow: none !important;
 }
 
-button:active, .btn:active {
-  background: #e0e0e0;
+.card-buttons button:hover {
+    background: var(--button-hover-bg);
+    border-color: rgba(255,255,255,0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    color: var(--flashcard-text) !important;
 }
 
-.btn-primary {
-  background: #007bff !important;
-  color: white !important;
-}
-
+/* Multi-button layout for difficulty buttons */
 .multi-buttons {
-  justify-content: space-between;
-  gap: 0;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
 .multi-buttons button {
-  flex: 1 1 20%;
-  margin: 0 6px;
+    flex: 1;
+    font-size: 0.9rem;
+    padding: 0.7rem 0.5rem;
+    min-width: 70px;
 }
 
-/* Responsive adjustments for longer content */
+/* Specific button colors for difficulty */
+.again-btn {
+    border-color: rgba(239, 68, 68, 0.7) !important;
+    background: rgba(239, 68, 68, 0.2) !important;
+}
+
+.hard-btn {
+    border-color: rgba(245, 158, 11, 0.7) !important;
+    background: rgba(245, 158, 11, 0.2) !important;
+}
+
+.medium-btn {
+    border-color: rgba(34, 197, 94, 0.7) !important;
+    background: rgba(34, 197, 94, 0.2) !important;
+}
+
+.easy-btn {
+    border-color: rgba(59, 130, 246, 0.7) !important;
+    background: rgba(59, 130, 246, 0.2) !important;
+}
+
+/* No cards state */
+.no-cards {
+    background: var(--flashcard-bg-front);
+}
+
+.no-cards-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--flashcard-text);
+    text-align: center;
+}
+
+.no-cards-content i {
+    font-size: 4rem;
+    opacity: 0.7;
+    margin-bottom: 1rem;
+}
+
+.no-cards-content .question {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.no-cards-content p {
+    font-size: 1rem;
+    opacity: 0.8;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .card {
+        min-height: 300px;
+        max-width: 95vw;
+    }
+    
+    .card-face {
+        padding: 1.5rem;
+        min-height: 300px;
+    }
+    
+    .question, .answer {
+        font-size: 1.4rem;
+    }
+    
+    .answer {
+        font-size: 1.2rem;
+    }
+    
+    .multi-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .multi-buttons button {
+        flex: none;
+        width: 100%;
+    }
+}
+
 @media (max-width: 480px) {
-  .card {
-    min-height: 170px;
-    padding: 0;
-  }
-
-  .card-face {
-    padding: 20px 10px 64px 10px;
-    min-height: 170px;
-  }
-
-  .card-buttons {
-    padding: 14px;
-  }
-
-  button, .btn {
-    font-size: 0.95rem;
-    padding: 10px 8px;
-  }
-  
-  .question, .answer {
-    font-size: 1.1rem;
-  }
-  
-  .answer {
-    font-size: 1rem;
-  }
-}
-
-/* Handle very long Malayalam text */
-@media (max-height: 600px) {
-  .answer {
-    font-size: 1rem;
-    line-height: 1.4;
-  }
+    .question, .answer {
+        font-size: 1.2rem;
+    }
+    
+    .answer {
+        font-size: 1.1rem;
+    }
+    
+    .card-buttons button {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
 }

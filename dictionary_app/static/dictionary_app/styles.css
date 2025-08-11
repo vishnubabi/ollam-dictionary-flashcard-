@@ -1,120 +1,447 @@
-/* ----- Global Styles ----- */
-body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #f9fafb;
+/* Import Modern Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Dictionary Dark Mode Variables */
+:root {
+    --dict-bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    --dict-header-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --dict-card-bg: #ffffff;
+    --dict-text: #1e293b;
+    --dict-text-muted: #64748b;
+    --dict-border: #e2e8f0;
+    --dict-shadow: rgba(0,0,0,0.1);
+}
+
+.dark-mode {
+    --dict-bg: linear-gradient(135deg, #0f1419 0%, #1a202c 100%);
+    --dict-header-bg: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+    --dict-card-bg: #1a202c;
+    --dict-text: #e2e8f0;
+    --dict-text-muted: #a0aec0;
+    --dict-border: #2d3748;
+    --dict-shadow: rgba(0,0,0,0.3);
+}
+
+/* Global Styles */
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
-/* ----- Button Success State ----- */
-.btn-success {
-    background-color: #28a745 !important;
-    border-color: #28a745 !important;
+html, body {
+    height: 100%;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--dict-bg);
+    line-height: 1.6;
+    color: var(--dict-text);
+    transition: all 0.3s ease;
 }
 
-.btn-success:disabled {
-    background-color: #28a745 !important;
-    border-color: #28a745 !important;
-    opacity: 0.8;
+/* Main Content Layout */
+.main-content {
+    margin-left: 280px;
+    transition: margin-left 0.3s ease;
+    min-height: 100vh;
+    padding: 2rem;
 }
 
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+        padding: 1rem;
+        padding-top: 4rem;
+    }
+}
 
-/* ----- Container Layout ----- */
+/* Container Layout */
 .container {
-    max-width: 720px;
+    max-width: 900px;
+    margin: 0 auto;
 }
 
-/* ----- Search Box Card ----- */
+/* Header Section */
+.search-header {
+    background: var(--dict-header-bg);
+    color: white;
+    padding: 3rem 0 2rem;
+    margin: -2rem -2rem 2rem -2rem;
+    border-radius: 0 0 2rem 2rem;
+    text-align: center;
+    box-shadow: 0 10px 30px var(--dict-shadow);
+}
+
+.search-header h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.search-header .subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+/* Search Box Card */
 .search-box {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    border-radius: 12px;
-    background: white;
-    padding: 24px;
+    background: var(--dict-card-bg);
+    border-radius: 24px;
+    padding: 2.5rem;
+    box-shadow: 0 20px 40px var(--dict-shadow);
+    margin: -2rem 1rem 3rem 1rem;
+    position: relative;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--dict-border);
+}
+
+/* UPDATED: Search Form Styling - 60% width */
+.search-form {
+    display: flex;
+    gap: 1rem;
+    align-items: stretch;
+    margin-bottom: 2rem;
+    /* New: Make search form 60% width and center it */
+    max-width: 600px;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
     margin-bottom: 2rem;
 }
 
-/* ----- Dictionary Entry Styling ----- */
-.entry {
-    padding: 16px;
-    border-bottom: 1px solid #eaeaea;
-}
-
-.entry:last-child {
-    border-bottom: none;
-}
-
-.word {
-    font-weight: 600;
+.search-input {
+    flex: 1;
+    border-radius: 16px;
+    border: 2px solid var(--dict-border);
+    padding: 1.2rem 1.5rem;
     font-size: 1.1rem;
-}
-
-.type {
-    font-style: italic;
-    color: #6c757d;
-    margin-bottom: 4px;
-}
-
-.meaning {
-    font-size: 1rem;
-    color: #333;
-}
-
-/* ----- Form Custom Styling ----- */
-form input[type="text"] {
-    border-radius: 8px;
-    padding: 12px 16px;
-}
-
-form button, form a.btn {
-    border-radius: 8px;
-    padding: 10px 20px;
     font-weight: 500;
+    transition: all 0.3s ease;
+    background: var(--dict-card-bg);
+    outline: none;
+    color: var(--dict-text);
 }
 
-form a.btn-secondary {
-    background-color: #6c757d;
-    border-color: #6c757d;
+.search-input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    background: var(--dict-card-bg);
+    transform: translateY(-1px);
 }
 
-form a.btn-secondary:hover {
-    background-color: #5a6268;
-    border-color: #545b62;
+.search-input::placeholder {
+    color: var(--dict-text-muted);
+    font-weight: 400;
 }
 
-/* Optional: add shadow to the form itself */
-.search-box form {
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    padding: 12px;
-    border-radius: 12px;
-    background: #ffffff;
+/* Button Styles */
+.btn {
+    border-radius: 16px;
+    padding: 1.2rem 2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    white-space: nowrap;
 }
 
-/* ----- Responsive Adjustments ----- */
-@media (max-width: 576px) {
-    .word {
-        font-size: 1rem;
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+    background: var(--dict-text-muted);
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(100, 116, 139, 0.3);
+}
+
+.btn-secondary:hover {
+    background: #475569;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(100, 116, 139, 0.4);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.btn-success:disabled {
+    opacity: 0.8;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Search Results Header */
+.results-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--dict-card-bg);
+    border-radius: 20px;
+    box-shadow: 0 8px 25px var(--dict-shadow);
+    border: 1px solid var(--dict-border);
+}
+
+.results-header h4 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--dict-text);
+    margin: 0;
+    flex-grow: 1;
+}
+
+.blue-text {
+    color: #667eea;
+    font-weight: 700;
+}
+
+.add-flashcard-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 20px;
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.add-flashcard-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Dictionary Entry Styling */
+.entry {
+    background: var(--dict-card-bg);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--dict-border);
+    box-shadow: 0 8px 25px var(--dict-shadow);
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.entry:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px var(--dict-shadow);
+    border-left-color: #667eea;
+}
+
+.entry .fw-bold {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--dict-text);
+    margin-bottom: 0.5rem;
+}
+
+.entry .text-primary {
+    color: #667eea !important;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.entry ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.entry li {
+    font-size: 1rem;
+    color: var(--dict-text);
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}
+
+.entry li:last-child {
+    margin-bottom: 0;
+}
+
+/* Related Words Section */
+.related-section {
+    margin-top: 3rem;
+}
+
+.related-section h4 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dict-text);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.related-entry {
+    background: var(--dict-card-bg);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--dict-border);
+    transition: all 0.3s ease;
+}
+
+.related-entry:hover {
+    transform: translateX(5px);
+    box-shadow: 0 8px 25px var(--dict-shadow);
+    border-color: #667eea;
+}
+
+.related-entry .fw-bold {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dict-text);
+    margin-bottom: 0.25rem;
+}
+
+.related-entry .text-muted {
+    font-size: 0.9rem;
+    color: var(--dict-text-muted);
+    font-style: italic;
+    margin-bottom: 0.5rem;
+}
+
+.related-entry div:last-child {
+    color: var(--dict-text);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* No Results State */
+.no-results {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: var(--dict-card-bg);
+    border-radius: 20px;
+    box-shadow: 0 8px 25px var(--dict-shadow);
+    color: var(--dict-text-muted);
+    border: 1px solid var(--dict-border);
+}
+
+.no-results i {
+    font-size: 3rem;
+    color: var(--dict-text-muted);
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.no-results h5 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--dict-text);
+    margin-bottom: 0.5rem;
+}
+
+.no-results p {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .search-header {
+        padding: 2rem 1rem 1.5rem;
+        margin: -1rem -1rem 1.5rem -1rem;
     }
-
-    .meaning {
+    
+    .search-header h2 {
+        font-size: 2rem;
+    }
+    
+    .search-box {
+        margin: -1.5rem 0.5rem 2rem 0.5rem;
+        padding: 2rem 1.5rem;
+    }
+    
+    /* UPDATED: Mobile search form - full width on mobile */
+    .search-form {
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+        max-width: none;
+    }
+    
+    .btn {
+        padding: 1rem 1.5rem;
         font-size: 0.95rem;
     }
-
-    .container {
-        padding: 0 1rem;
-    }
-
-    form {
+    
+    .results-header {
         flex-direction: column;
+        gap: 1rem;
+        text-align: center;
     }
-
-    form input,
-    form button,
-    form a.btn {
+    
+    .add-flashcard-btn {
         width: 100%;
+    }
+    
+    .entry {
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .related-entry {
+        padding: 1.25rem;
     }
 }
 
-/* ----- query result (add ...result... to flashcard)  ----- */
-.blue-text {
-    color: blue;
+@media (max-width: 576px) {
+    .search-header h2 {
+        font-size: 1.8rem;
+    }
+    
+    .search-header .subtitle {
+        font-size: 1rem;
+    }
+    
+    .search-box {
+        margin: -1rem 0 1.5rem 0;
+        padding: 1.5rem 1rem;
+        border-radius: 20px;
+    }
+    
+    .search-input {
+        padding: 1rem 1.2rem;
+        font-size: 1rem;
+    }
+    
+    .btn {
+        padding: 0.9rem 1.2rem;
+        font-size: 0.9rem;
+    }
+    
+    .entry {
+        padding: 1.25rem;
+    }
+    
+    .entry .fw-bold {
+        font-size: 1.1rem;
+    }
+    
+    .related-section h4 {
+        font-size: 1.3rem;
+    }
 }
