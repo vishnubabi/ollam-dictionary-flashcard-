@@ -1,131 +1,170 @@
 {% include "sidebar.html" %}
-
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Malayalam Flashcards</title>
+    <title>Malayalam Flashcards - Smart Learning</title>
     
-    <!-- Bootstrap CSS CDN -->
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Custom Flashcard CSS -->
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'flashcard_app/style.css' %}">
 </head>
 <body>
-    <!-- Mobile Toggle Button -->
+    <!-- Mobile Toggle -->
     <button class="sidebar-toggle d-md-none" id="sidebarToggle">
         <i class="bi bi-list"></i>
     </button>
-
+    
     <!-- Mobile Overlay -->
     <div class="sidebar-overlay d-md-none" id="sidebarOverlay"></div>
-
+    
     <!-- Main Content -->
     <div class="main-content">
+        <!-- Progress Header -->
+        <div class="progress-header">
+            <div class="progress-stats">
+                <div class="stat-card">
+                    <div class="stat-number">{{ due_today|default:"0" }}</div>
+                    <div class="stat-label">Due Today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ reviewed_today|default:"0" }}</div>
+                    <div class="stat-label">Reviewed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ total_cards|default:"0" }}</div>
+                    <div class="stat-label">Total Cards</div>
+                </div>
+            </div>
+            
+            <div class="study-streak">
+                <i class="bi bi-fire"></i>
+                <span>Study Time!</span>
+            </div>
+        </div>
+        
+        <!-- Flashcard Container -->
         <div class="flashcard-container">
             {% if current_flashcard %}
-            <div class="card" id="card">
+            <div class="flashcard" id="flashcard" data-card-id="{{ current_flashcard.id }}">
                 <!-- Front Side -->
-                <div class="card-face card-front" id="card-front">
-                    <div class="card-header">
+                <div class="flashcard-face flashcard-front" id="front-face">
+                    <div class="card-type-indicator">
                         <i class="bi bi-translate"></i>
-                        <span>English to Malayalam</span>
+                        <span>English → Malayalam</span>
                     </div>
-                    <div class="question" id="question-text">
-                        {{ current_flashcard.english_word }}
+                    
+                    <div class="word-container">
+                        <div class="english-word">{{ current_flashcard.english_word }}</div>
+                        <div class="word-hint">Think about the meaning...</div>
                     </div>
-                    <div class="card-buttons" id="front-buttons">
-                        <button id="show-btn" type="button">
-                            <i class="bi bi-eye me-2"></i>
-                            Show Answer
+                    
+                    <div class="card-actions">
+                        <button class="btn-reveal" id="revealBtn">
+                            <i class="bi bi-eye"></i>
+                            <span>Show Answer</span>
                         </button>
                     </div>
                 </div>
-
+                
                 <!-- Back Side -->
-                <div class="card-face card-back" id="card-back">
-                    <div class="card-header">
+                <div class="flashcard-face flashcard-back" id="back-face">
+                    <div class="card-type-indicator">
                         <i class="bi bi-check-circle"></i>
                         <span>Malayalam Translation</span>
                     </div>
-                    <div class="answer" id="answer-text">
-                        {{ current_flashcard.malayalam_meaning }}
+                    
+                    <!-- Scrollable Meaning Container -->
+                    <div class="meaning-container" id="meaningContainer">
+                        {% if parsed_meaning %}
+                            {% for section in parsed_meaning %}
+                            <div class="meaning-section">
+                                <div class="pos-tag pos-{{ section.type_code }}">
+                                    {{ section.type }}
+                                </div>
+                                <div class="meanings-list">
+                                    {% for meaning in section.meanings %}
+                                    <div class="meaning-item">{{ meaning }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="meaning-section">
+                                <div class="meanings-list">
+                                    <div class="meaning-item">{{ current_flashcard.malayalam_meaning }}</div>
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
-                    <div class="card-buttons multi-buttons" id="back-buttons" style="display:none;">
-                        <button type="button" class="difficulty-btn again-btn" onclick="window.location.reload()">
-                            <i class="bi bi-arrow-clockwise me-1"></i>
-                            Again
-                        </button>
-                        <button type="button" class="difficulty-btn hard-btn" onclick="window.location.reload()">
-                            <i class="bi bi-exclamation-triangle me-1"></i>
-                            Hard
-                        </button>
-                        <button type="button" class="difficulty-btn medium-btn" onclick="window.location.reload()">
-                            <i class="bi bi-dash-circle me-1"></i>
-                            Good
-                        </button>
-                        <button type="button" class="difficulty-btn easy-btn" onclick="window.location.reload()">
-                            <i class="bi bi-check-circle me-1"></i>
-                            Easy
-                        </button>
+                    
+                    <!-- Fixed Review Buttons -->
+                    <div class="review-actions" id="reviewActions" style="display: none;">
+                        <div class="difficulty-prompt">How well did you know this?</div>
+                        <div class="difficulty-buttons">
+                            <button class="difficulty-btn again-btn" data-difficulty="1">
+                                <i class="bi bi-arrow-clockwise"></i>
+                                <span>Again</span>
+                                <small>&lt;1min</small>
+                            </button>
+                            <button class="difficulty-btn hard-btn" data-difficulty="2">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                <span>Hard</span>
+                                <small>&lt;6min</small>
+                            </button>
+                            <button class="difficulty-btn good-btn" data-difficulty="3">
+                                <i class="bi bi-hand-thumbs-up"></i>
+                                <span>Good</span>
+                                <small>&lt;10min</small>
+                            </button>
+                            <button class="difficulty-btn easy-btn" data-difficulty="4">
+                                <i class="bi bi-check-circle"></i>
+                                <span>Easy</span>
+                                <small>4 days</small>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Flashcard Stats -->
-            <div class="flashcard-stats mt-4">
-                <div class="stat-item">
-                    <i class="bi bi-collection"></i>
-                    <span>Total Cards: {{ total_cards|default:"0" }}</span>
-                </div>
-                <div class="stat-item">
-                    <i class="bi bi-trophy"></i>
-                    <span>Studied Today: {{ studied_today|default:"0" }}</span>
-                </div>
-            </div>
-
+            
             {% else %}
-            <!-- No Flashcards Available -->
-            <div class="card no-cards">
-                <div class="card-face card-front">
-                    <div class="no-cards-content">
-                        <i class="bi bi-collection mb-3"></i>
-                        <div class="question">
-                            No flashcards available yet!
-                        </div>
-                        <p class="text-muted mb-4">
-                            Start building your vocabulary by adding words from the dictionary.
-                        </p>
-                        <div class="card-buttons">
-                            <a href="{% url 'dictionary_list' %}" class="btn btn-primary">
-                                <i class="bi bi-book me-2"></i>
-                                Go to Dictionary
-                            </a>
-                        </div>
-                    </div>
+            <!-- No Cards Available -->
+            <div class="no-cards-state">
+                <div class="no-cards-icon">
+                    <i class="bi bi-collection"></i>
                 </div>
+                <h3>No flashcards available!</h3>
+                <p>Start building your vocabulary by adding words from the dictionary.</p>
+                <a href="{% url 'dictionary_list' %}" class="btn btn-primary">
+                    <i class="bi bi-book"></i>
+                    Go to Dictionary
+                </a>
             </div>
             {% endif %}
         </div>
-
-        <!-- Action Buttons -->
-        <div class="action-buttons">
-            <a href="{% url 'dictionary_list' %}" class="action-btn dictionary-btn">
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <a href="{% url 'dictionary_list' %}" class="quick-action-btn">
                 <i class="bi bi-book"></i>
                 <span>Dictionary</span>
             </a>
-            <button class="action-btn shuffle-btn" onclick="window.location.reload()">
-                <i class="bi bi-shuffle"></i>
+            <button class="quick-action-btn" onclick="location.reload()">
+                <i class="bi bi-arrow-clockwise"></i>
                 <span>Next Card</span>
             </button>
         </div>
     </div>
 
-    <!-- JavaScript -->
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'flashcard_app/script.js' %}"></script>
 </body>

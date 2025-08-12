@@ -1,0 +1,603 @@
+/* Import Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap');
+
+/* CSS Custom Properties */
+:root {
+  /* Colors */
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --danger-gradient: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%);
+  
+  --text-primary: #1a202c;
+  --text-secondary: #4a5568;
+  --text-muted: #718096;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f7fafc;
+  --border-color: #e2e8f0;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
+  --shadow-xl: 0 20px 40px rgba(0,0,0,0.1);
+  
+  /* Dark mode colors */
+  --dark-bg-primary: #1a202c;
+  --dark-bg-secondary: #2d3748;
+  --dark-text-primary: #f7fafc;
+  --dark-text-secondary: #e2e8f0;
+  --dark-border: #4a5568;
+}
+
+.dark-mode {
+  --text-primary: var(--dark-text-primary);
+  --text-secondary: var(--dark-text-secondary);
+  --bg-primary: var(--dark-bg-primary);
+  --bg-secondary: var(--dark-bg-secondary);
+  --border-color: var(--dark-border);
+}
+
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  transition: all 0.3s ease;
+}
+
+/* Main Content */
+.main-content {
+  margin-left: 280px;
+  min-height: 100vh;
+  padding: 1.5rem 2rem;
+  transition: margin-left 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+    padding: 1rem;
+    padding-top: 4rem;
+  }
+}
+
+/* Progress Header */
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  background: var(--bg-primary);
+  padding: 1.5rem;
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+}
+
+.progress-stats {
+  display: flex;
+  gap: 2rem;
+}
+
+.stat-card {
+  text-align: center;
+  padding: 1rem;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 800;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: 0.25rem;
+}
+
+.study-streak {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--success-gradient);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+}
+
+/* Flashcard Container - MOVED HIGHER */
+.flashcard-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Changed from center to flex-start */
+  min-height: 450px; /* Reduced height */
+  margin-bottom: 2rem;
+  perspective: 1000px;
+  padding-top: 1rem; /* Added top padding */
+}
+
+/* Modern Flashcard - FIXED SIZE */
+.flashcard {
+  width: 100%;
+  max-width: 500px;
+  height: 400px; /* FIXED HEIGHT - never changes */
+  min-height: 400px;
+  max-height: 400px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.flashcard.flipped {
+  transform: rotateY(180deg);
+  /* Height stays the same when flipped */
+  height: 400px;
+  min-height: 400px;
+  max-height: 400px;
+}
+
+.flashcard-face {
+  position: absolute;
+  width: 100%;
+  height: 100%; /* FIXED HEIGHT - 400px */
+  backface-visibility: hidden;
+  border-radius: 24px;
+  background: var(--bg-primary);
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.flashcard-front {
+  background: var(--primary-gradient);
+  color: white;
+}
+
+.flashcard-back {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transform: rotateY(180deg);
+}
+
+/* Card Type Indicator */
+.card-type-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  opacity: 0.9;
+  margin-bottom: 1.5rem;
+  flex-shrink: 0;
+}
+
+/* Word Container */
+.word-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.english-word {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.word-hint {
+  font-size: 1rem;
+  opacity: 0.8;
+  font-style: italic;
+}
+
+/* Meaning Container - SCROLLABLE INSIDE FIXED CARD */
+.meaning-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-bottom: 1.5rem;
+  padding-right: 0.5rem;
+  /* FIXED HEIGHT for internal scrolling */
+  max-height: 200px;
+  height: 200px;
+}
+
+.meaning-section {
+  margin-bottom: 1.5rem;
+}
+
+.pos-tag {
+  display: inline-block;
+  padding: 0.375rem 0.875rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.75rem;
+}
+
+.pos-noun {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+.pos-verb {
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+  color: white;
+}
+
+.pos-adjective {
+  background: linear-gradient(135deg, #11998e, #38ef7d);
+  color: white;
+}
+
+.pos-general {
+  background: linear-gradient(135deg, #a8edea, #fed6e3);
+  color: #2d3748;
+}
+
+.meanings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.meaning-item {
+  font-family: 'Noto Sans Malayalam', 'Inter', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--text-primary);
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.meaning-item:last-child {
+  border-bottom: none;
+}
+
+/* Custom Scrollbar for Meaning Container */
+.meaning-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.meaning-container::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+.meaning-container::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.meaning-container::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Firefox scrollbar */
+.meaning-container {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) var(--bg-secondary);
+}
+
+/* Card Actions */
+.card-actions {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.btn-reveal {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50px;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  backdrop-filter: blur(10px);
+}
+
+.btn-reveal:hover {
+  background: rgba(255,255,255,0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+/* Review Actions - FIXED AT BOTTOM OF CARD */
+.review-actions {
+  flex-shrink: 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  margin-top: auto;
+  height: 100px; /* Fixed height */
+}
+
+.difficulty-prompt {
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.difficulty-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+}
+
+.difficulty-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.6rem 0.4rem;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: var(--bg-secondary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.difficulty-btn small {
+  font-size: 0.7rem;
+  opacity: 0.7;
+  font-weight: 400;
+}
+
+.again-btn {
+  border-color: #fc466b;
+  color: #fc466b;
+}
+
+.again-btn:hover {
+  background: #fc466b;
+  color: white;
+}
+
+.hard-btn {
+  border-color: #f5576c;
+  color: #f5576c;
+}
+
+.hard-btn:hover {
+  background: #f5576c;
+  color: white;
+}
+
+.good-btn {
+  border-color: #38ef7d;
+  color: #38ef7d;
+}
+
+.good-btn:hover {
+  background: #38ef7d;
+  color: white;
+}
+
+.easy-btn {
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.easy-btn:hover {
+  background: #667eea;
+  color: white;
+}
+
+/* Card Info */
+.card-info {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+}
+
+.review-count {
+  background: rgba(255,255,255,0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 15px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* No Cards State */
+.no-cards-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--bg-primary);
+  border-radius: 24px;
+  box-shadow: var(--shadow-md);
+}
+
+.no-cards-icon {
+  font-size: 4rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.no-cards-state h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.no-cards-state p {
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+/* Quick Actions */
+.quick-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.quick-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  text-decoration: none;
+  border-radius: 16px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+}
+
+.quick-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  color: var(--text-primary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .flashcard {
+    height: 380px;
+    min-height: 380px;
+    max-height: 380px;
+  }
+  
+  .flashcard.flipped {
+    height: 380px;
+    min-height: 380px;
+    max-height: 380px;
+  }
+  
+  .flashcard-face {
+    padding: 1.5rem;
+  }
+  
+  .english-word {
+    font-size: 2rem;
+  }
+  
+  .meaning-container {
+    max-height: 160px;
+    height: 160px;
+  }
+  
+  .meaning-item {
+    font-size: 1.1rem;
+  }
+  
+  .progress-stats {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .quick-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .difficulty-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .difficulty-btn {
+    flex-direction: row;
+    justify-content: center;
+    padding: 1rem;
+  }
+  
+  .review-actions {
+    height: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .flashcard {
+    height: 360px;
+    min-height: 360px;
+    max-height: 360px;
+  }
+  
+  .flashcard.flipped {
+    height: 360px;
+    min-height: 360px;
+    max-height: 360px;
+  }
+  
+  .english-word {
+    font-size: 1.75rem;
+  }
+  
+  .meaning-container {
+    max-height: 140px;
+    height: 140px;
+  }
+  
+  .meaning-item {
+    font-size: 1rem;
+  }
+}
+
+/* Loading and Animation States */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.difficulty-btn.selected {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus states */
+.btn-reveal:focus,
+.difficulty-btn:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
