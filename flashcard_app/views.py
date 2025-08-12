@@ -6,8 +6,11 @@ from django.utils import timezone
 from .models import Flashcard
 import json
 import random
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def flashcard_views(request):
+    
     # Get due flashcards (cards ready for review)
     due_flashcards = Flashcard.objects.filter(
         next_review__lte=timezone.now()
