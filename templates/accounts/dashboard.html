@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <h2>Welcome back, {{ user.first_name|default:user.username }}!</h2>
+    <p class="text-muted">Here's your learning dashboard.</p>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <i class="bi bi-book-half" style="font-size: 3rem; color: #0d6efd;"></i>
+        <h5 class="card-title mt-3">Dictionary</h5>
+        <p class="card-text">Search Malayalam-English dictionary</p>
+        <a href="{% url 'dictionary_list' %}" class="btn btn-primary">Browse Dictionary</a>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <i class="bi bi-collection-play" style="font-size: 3rem; color: #dc3545;"></i>
+        <h5 class="card-title mt-3">Flashcards</h5>
+        <p class="card-text">Practice with your saved flashcards</p>
+        <a href="{% url 'flashcard_home' %}" class="btn btn-danger">Study Flashcards</a>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <i class="bi bi-person-circle" style="font-size: 3rem; color: #198754;"></i>
+        <h5 class="card-title mt-3">Profile</h5>
+        <p class="card-text">Manage your account settings</p>
+        <a href="{% url 'profile' %}" class="btn btn-success">View Profile</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

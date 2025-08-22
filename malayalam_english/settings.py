@@ -1,3 +1,4 @@
+# settings.py
 """
 Django settings for malayalam_english project.
 
@@ -40,7 +41,6 @@ INSTALLED_APPS = [
     'dictionary_app',
     'flashcard_app',
     'accounts',
-    
 ]
 
 MIDDLEWARE = [
@@ -130,9 +130,35 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 
-# Redirect after login/logout
-LOGIN_REDIRECT_URL = '/'
+# ---------------------------------------------------------------------------------------
+# Custom Authentication, Session, and Email Settings
+# ---------------------------------------------------------------------------------------
+
+# Authentication settings
+LOGIN_REDIRECT_URL = '/accounts/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = '/accounts/login/'
+
+# Session settings
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 7  # 7 days
+SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_SAVE_EVERY_REQUEST = False
+
+# Email settings (for password reset)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Development
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # Production
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'your-email@gmail.com'
+# EMAIL_HOST_PASSWORD = 'your-password'
+
+# ---------------------------------------------------------------------------------------
+# End of Custom Settings
+# ---------------------------------------------------------------------------------------

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-body">
+        <h3 class="card-title">My Profile</h3>
+        
+        <div class="row mb-3">
+          <div class="col-sm-3"><strong>Username:</strong></div>
+          <div class="col-sm-9">{{ user.username }}</div>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-sm-3"><strong>First Name:</strong></div>
+          <div class="col-sm-9">{{ user.first_name|default:"Not set" }}</div>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-sm-3"><strong>Last Name:</strong></div>
+          <div class="col-sm-9">{{ user.last_name|default:"Not set" }}</div>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-sm-3"><strong>Email:</strong></div>
+          <div class="col-sm-9">{{ user.email|default:"Not set" }}</div>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-sm-3"><strong>Date Joined:</strong></div>
+          <div class="col-sm-9">{{ user.date_joined|date:"F d, Y" }}</div>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-sm-3"><strong>Last Login:</strong></div>
+          <div class="col-sm-9">{{ user.last_login|date:"F d, Y H:i" }}</div>
+        </div>
+        
+        <div class="mt-4">
+          <a href="{% url 'password_change' %}" class="btn btn-warning me-2">Change Password</a>
+          <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
