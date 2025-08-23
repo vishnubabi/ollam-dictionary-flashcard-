@@ -1,135 +1,138 @@
-// Flashcard App with Enhanced Features
+// ============================================
+// Malayalam Flashcard App - Auto Next Flashcard
+// ============================================
+
 class FlashcardApp {
     constructor() {
         this.currentCard = null;
+        this._submitting = false;
         this.sessionStats = {
             reviewed: 0,
             correct: 0,
             startTime: new Date()
         };
-        
+
         this.init();
     }
-    
+
     init() {
-        console.log('🎯 Initializing Modern Flashcard App');
-        
-        // Get DOM elements
+        console.log('🎯 Initializing Malayalam Flashcard App');
+
+        // DOM Elements
         this.flashcard = document.getElementById('flashcard');
         this.frontFace = document.getElementById('front-face');
         this.backFace = document.getElementById('back-face');
         this.revealBtn = document.getElementById('revealBtn');
         this.reviewActions = document.getElementById('reviewActions');
         this.meaningContainer = document.getElementById('meaningContainer');
-        
-        // Get card data
+
         if (this.flashcard) {
-            this.currentCard = {
-                id: this.flashcard.dataset.cardId
-            };
+            this.currentCard = { id: this.flashcard.dataset.cardId };
         }
-        
-        this.bindEvents();
+
+        // Initial bindings
+        this.setupEventListeners(); // Replaced bindCardEvents with a single setup
         this.setupKeyboardShortcuts();
         this.setupTouchGestures();
         this.checkScrollIndicator();
     }
-    
-    bindEvents() {
-        // Reveal answer
-        if (this.revealBtn) {
-            this.revealBtn.addEventListener('click', () => this.revealAnswer());
-        }
-        
-        // Difficulty buttons
-        document.querySelectorAll('.difficulty-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const difficulty = parseInt(e.currentTarget.dataset.difficulty);
+
+    /**
+     * FIX: Use event delegation to avoid attaching multiple listeners.
+     * A single listener on the document body handles clicks for all relevant buttons.
+     */
+    setupEventListeners() {
+        document.body.addEventListener('click', (e) => {
+            // Find the closest matching button from the click target
+            const revealButton = e.target.closest('#revealBtn');
+            const difficultyButton = e.target.closest('.difficulty-btn');
+
+            if (revealButton) {
+                this.revealAnswer();
+            } else if (difficultyButton) {
+                const difficulty = parseInt(difficultyButton.dataset.difficulty);
                 this.submitReview(difficulty);
-            });
+            }
         });
-        
-        // Window resize handler
-        window.addEventListener('resize', () => this.checkScrollIndicator());
     }
-    
+
     revealAnswer() {
-        console.log('👀 Revealing answer');
-        
-        // Add visual feedback
-        this.revealBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> <span>Revealing...</span>';
+        if (!this.flashcard || this.flashcard.classList.contains('flipped')) return;
+
         this.revealBtn.disabled = true;
-        
-        // Flip card after short delay
+        this.revealBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> <span>Revealing...</span>';
+
         setTimeout(() => {
             this.flashcard.classList.add('flipped');
-            
-            // Show review actions after flip animation
+
             setTimeout(() => {
                 this.reviewActions.style.display = 'block';
                 this.reviewActions.style.opacity = '0';
-                
-                // Fade in review actions
                 requestAnimationFrame(() => {
                     this.reviewActions.style.transition = 'opacity 0.3s ease';
                     this.reviewActions.style.opacity = '1';
                 });
-                
                 this.checkScrollIndicator();
                 this.startReviewTimer();
             }, 400);
         }, 300);
     }
-    
+
     submitReview(difficulty) {
-        console.log(`📝 Submitting review with difficulty: ${difficulty}`);
-        
-        // Visual feedback
+        if (!this.currentCard || this._submitting) return; // prevent double submit
+        this._submitting = true;
+
         const selectedBtn = document.querySelector(`[data-difficulty="${difficulty}"]`);
-        selectedBtn.classList.add('selected');
-        
-        // Add completion effect
+        if (selectedBtn) selectedBtn.classList.add('selected');
+
         this.addCompletionEffect(difficulty);
-        
-        // Disable all buttons
+
         document.querySelectorAll('.difficulty-btn').forEach(btn => {
             btn.disabled = true;
-            if (btn !== selectedBtn) {
-                btn.style.opacity = '0.5';
-            }
+            if (btn !== selectedBtn) btn.style.opacity = '0.5';
         });
-        
-        // Update session stats
+
+        // Update stats
         this.sessionStats.reviewed++;
-        if (difficulty >= 3) {
-            this.sessionStats.correct++;
+        if (difficulty >= 3) this.sessionStats.correct++;
+
+        if (selectedBtn) {
+            selectedBtn.innerHTML = `
+                <i class="bi bi-check-circle"></i>
+                <span>Selected</span>
+                <small>Loading next...</small>
+            `;
         }
-        
-        // Show selected state
-        selectedBtn.innerHTML = `
-            <i class="bi bi-check-circle"></i>
-            <span>Selected</span>
-            <small>Loading...</small>
-        `;
-        
-        // Auto-proceed to next card
+
         setTimeout(() => {
-            this.loadNextCard();
-        }, 1500);
+            this.fetchNextCard(difficulty)
+                .then(nextCard => {
+                    if (nextCard) {
+                        this.updateCardDOM(nextCard);
+                    } else {
+                        this.showNoMoreCardsMessage();
+                    }
+                })
+                .catch(err => {
+                    console.error('Failed to fetch next card', err);
+                    this.showError('Could not load next card. Please try again.');
+                    this.resetButtonsAfterError();
+                })
+                .finally(() => {
+                    this._submitting = false;
+                });
+        }, 600);
     }
-    
+
     addCompletionEffect(difficulty) {
-        // Create effect based on difficulty
         const effects = {
             1: { emoji: '🔄', color: '#fc466b', message: 'Try again!' },
             2: { emoji: '😅', color: '#f5576c', message: 'Getting there!' },
             3: { emoji: '👍', color: '#38ef7d', message: 'Good job!' },
             4: { emoji: '🎉', color: '#667eea', message: 'Excellent!' }
         };
-        
-        const effect = effects[difficulty];
-        
-        // Add floating effect
+
+        const effect = effects[difficulty] || effects[3];
         const floatingEffect = document.createElement('div');
         floatingEffect.className = 'floating-effect';
         floatingEffect.innerHTML = `
@@ -137,20 +140,12 @@ class FlashcardApp {
             <div class="effect-message">${effect.message}</div>
         `;
         floatingEffect.style.cssText = `
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: ${effect.color};
-            animation: float 1.5s ease-out;
-            pointer-events: none;
-            z-index: 1000;
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); text-align: center;
+            font-size: 1.5rem; font-weight: 700; color: ${effect.color};
+            animation: float 1.5s ease-out; pointer-events: none; z-index: 1000;
         `;
-        
-        // Add animation keyframes
+
         if (!document.querySelector('#float-animation')) {
             const style = document.createElement('style');
             style.id = 'float-animation';
@@ -160,284 +155,203 @@ class FlashcardApp {
                     50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1) translateY(-10px); }
                     100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8) translateY(-30px); }
                 }
-                .effect-emoji { font-size: 2rem; margin-bottom: 0.5rem; }
-                .effect-message { font-size: 1rem; }
             `;
             document.head.appendChild(style);
         }
         
         this.flashcard.appendChild(floatingEffect);
-        
-        // Remove after animation
-        setTimeout(() => {
-            floatingEffect.remove();
-        }, 1500);
+        setTimeout(() => floatingEffect.remove(), 1500);
     }
-    
-    loadNextCard() {
-        // Add loading state
-        document.body.classList.add('loading');
-        
-        // Reload page for next card
-        window.location.reload();
+
+    fetchNextCard(difficulty) {
+        const csrftoken = this.getCsrfToken();
+
+        return fetch('/flashcards/review/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+                'X-Requested-With': 'XMLHttpRequest' // Good practice for AJAX
+            },
+            body: JSON.stringify({
+                flashcard_id: this.currentCard.id,
+                difficulty: difficulty
+            })
+        })
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.json();
+        })
+        .then(data => {
+            if (!data.success) throw new Error(data.error || 'Unknown error');
+            return data.next_flashcard || null;
+        });
     }
-    
-    checkScrollIndicator() {
-        if (this.meaningContainer && this.flashcard.classList.contains('flipped')) {
-            const isScrollable = this.meaningContainer.scrollHeight > this.meaningContainer.clientHeight;
-            
-            if (isScrollable) {
-                // Add visual scroll indicator
-                this.meaningContainer.style.borderRight = '3px solid rgba(102, 126, 234, 0.3)';
-                
-                // Add scroll hint if not already present
-                if (!this.meaningContainer.querySelector('.scroll-hint')) {
-                    const hint = document.createElement('div');
-                    hint.className = 'scroll-hint';
-                    hint.innerHTML = '<i class="bi bi-chevron-down"></i>';
-                    hint.style.cssText = `
-                        position: absolute;
-                        bottom: 5px;
-                        right: 5px;
-                        color: rgba(102, 126, 234, 0.6);
-                        font-size: 1rem;
-                        animation: bounce 2s infinite;
-                        pointer-events: none;
-                    `;
-                    
-                    // Add bounce animation if not already present
-                    if (!document.querySelector('#bounce-animation')) {
-                        const bounceStyle = document.createElement('style');
-                        bounceStyle.id = 'bounce-animation';
-                        bounceStyle.textContent = `
-                            @keyframes bounce {
-                                0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-                                40% { transform: translateY(-5px); }
-                                60% { transform: translateY(-3px); }
-                            }
-                        `;
-                        document.head.appendChild(bounceStyle);
-                    }
-                    
-                    this.meaningContainer.style.position = 'relative';
-                    this.meaningContainer.appendChild(hint);
-                    
-                    // Remove hint after user scrolls
-                    this.meaningContainer.addEventListener('scroll', () => {
-                        hint.remove();
-                    }, { once: true });
-                }
-            } else {
-                this.meaningContainer.style.borderRight = 'none';
+
+    fetchRandomFlashcard() {
+        return fetch('/flashcards/?random=1', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+            .then(res => res.json())
+            .then(data => data.success && data.card ? data.card : null)
+            .catch(() => null);
+    }
+
+    updateCardDOM(card) {
+        if (!card) return;
+
+        this.currentCard = { id: card.id };
+        this.flashcard.dataset.cardId = card.id;
+        
+        const englishNode = document.querySelector('.english-word');
+        if (englishNode) englishNode.textContent = card.english_word || '';
+
+        this.meaningContainer.innerHTML = '';
+
+        (card.parsed_meaning || []).forEach(section => {
+            const secDiv = document.createElement('div');
+            secDiv.classList.add('meaning-section');
+            secDiv.innerHTML = `
+                <div class="pos-tag pos-${section.type_code}">${section.type}</div>
+                <div class="meanings-list">
+                    ${(section.meanings || []).map(m => `<div class="meaning-item">${m}</div>`).join('')}
+                </div>
+            `;
+            this.meaningContainer.appendChild(secDiv);
+        });
+
+        // Reset state
+        this.flashcard.classList.remove('flipped');
+        this.reviewActions.style.display = 'none';
+        this.revealBtn.disabled = false;
+        this.revealBtn.innerHTML = '<i class="bi bi-eye"></i> <span>Show Answer</span>';
+        
+        // Reset difficulty buttons
+        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.classList.remove('selected');
+            if (btn.dataset.original) {
+                btn.innerHTML = btn.dataset.original;
+            } else { // Store original state on first run
+                btn.dataset.original = btn.innerHTML;
             }
-        }
+        });
+
+        this.checkScrollIndicator();
     }
-    
-    startReviewTimer() {
-        // Track time spent reviewing
-        this.reviewStartTime = new Date();
+
+    getCsrfToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
     }
-    
+
+    checkScrollIndicator() {
+        if (!this.meaningContainer) return;
+        this.meaningContainer.style.borderRight = this.flashcard.classList.contains('flipped') &&
+            this.meaningContainer.scrollHeight > this.meaningContainer.clientHeight
+            ? '3px solid rgba(102,126,234,0.3)' : 'none';
+    }
+
+    startReviewTimer() { this.reviewStartTime = new Date(); }
+
     setupKeyboardShortcuts() {
         document.addEventListener('keydown', (e) => {
-            // Prevent shortcuts if typing
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-            
+            if (!this.flashcard) return;
+
             switch(e.code) {
                 case 'Space':
                     e.preventDefault();
-                    if (!this.flashcard.classList.contains('flipped')) {
-                        this.revealAnswer();
-                    }
+                    if (!this.flashcard.classList.contains('flipped')) this.revealAnswer();
                     break;
-                    
-                case 'Digit1':
-                case 'Numpad1':
-                    e.preventDefault();
-                    if (this.flashcard.classList.contains('flipped')) {
-                        this.submitReview(1);
-                    }
+                case 'Digit1': case 'Numpad1':
+                    if (this.flashcard.classList.contains('flipped')) this.submitReview(1);
                     break;
-                    
-                case 'Digit2':
-                case 'Numpad2':
-                    e.preventDefault();
-                    if (this.flashcard.classList.contains('flipped')) {
-                        this.submitReview(2);
-                    }
+                case 'Digit2': case 'Numpad2':
+                    if (this.flashcard.classList.contains('flipped')) this.submitReview(2);
                     break;
-                    
-                case 'Digit3':
-                case 'Numpad3':
-                    e.preventDefault();
-                    if (this.flashcard.classList.contains('flipped')) {
-                        this.submitReview(3);
-                    }
+                case 'Digit3': case 'Numpad3':
+                    if (this.flashcard.classList.contains('flipped')) this.submitReview(3);
                     break;
-                    
-                case 'Digit4':
-                case 'Numpad4':
-                    e.preventDefault();
-                    if (this.flashcard.classList.contains('flipped')) {
-                        this.submitReview(4);
-                    }
-                    break;
-                    
-                case 'KeyR':
-                    if (e.ctrlKey || e.metaKey) {
-                        e.preventDefault();
-                        this.loadNextCard();
-                    }
-                    break;
-                    
-                case 'Escape':
-                    e.preventDefault();
-                    this.showHelp();
+                case 'Digit4': case 'Numpad4':
+                    if (this.flashcard.classList.contains('flipped')) this.submitReview(4);
                     break;
             }
         });
-        
-        // Show keyboard shortcuts hint
-        this.showKeyboardHint();
     }
-    
+
     setupTouchGestures() {
-        let startY = 0;
-        let startX = 0;
-        let startTime = 0;
+        if (!this.flashcard) return;
+        let startY = 0, startX = 0, startTime = 0;
         
-        this.flashcard?.addEventListener('touchstart', (e) => {
-            startY = e.touches[0].clientY;
-            startX = e.touches[0].clientX;
+        this.flashcard.addEventListener('touchstart', e => {
+            startY = e.touches[0].clientY; 
+            startX = e.touches[0].clientX; // FIX: Was e.touches.clientX
             startTime = new Date().getTime();
-        }, { passive: true });
+        }, {passive: true});
         
-        this.flashcard?.addEventListener('touchend', (e) => {
-            const endY = e.changedTouches[0].clientY;
-            const endX = e.changedTouches[0].clientX;
+        this.flashcard.addEventListener('touchend', e => {
+            const endY = e.changedTouches[0].clientY; // FIX: Was e.changedTouches.clientY
+            const endX = e.changedTouches[0].clientX; // FIX: Was e.changedTouches.clientX
             const endTime = new Date().getTime();
             const deltaY = startY - endY;
-            const deltaX = Math.abs(startX - endX);
+            const deltaX = startX - endX;
             const deltaTime = endTime - startTime;
             
-            // Swipe up to reveal (fast swipe)
-            if (deltaY > 50 && deltaX < 100 && deltaTime < 300 && 
-                !this.flashcard.classList.contains('flipped')) {
+            // Swipe up to reveal
+            if(deltaY > 50 && Math.abs(deltaX) < 100 && deltaTime < 300 && !this.flashcard.classList.contains('flipped')) {
                 this.revealAnswer();
             }
-            
-            // Swipe left/right for next card (when card is flipped)
-            if (Math.abs(deltaX) > 100 && deltaY < 50 && deltaTime < 300 &&
-                this.flashcard.classList.contains('flipped')) {
-                this.loadNextCard();
+            // Swipe left/right to get random card
+            if(Math.abs(deltaX) > 100 && Math.abs(deltaY) < 50 && deltaTime < 300 && this.flashcard.classList.contains('flipped')) {
+                this.fetchRandomFlashcard().then(nextCard => {
+                    if (nextCard) this.updateCardDOM(nextCard);
+                });
             }
-        }, { passive: true });
+        }, {passive: true});
     }
-    
-    showKeyboardHint() {
-        // Show keyboard shortcuts for first-time users
-        const hasSeenHint = localStorage.getItem('flashcard_keyboard_hint');
-        if (!hasSeenHint) {
-            setTimeout(() => {
-                this.showToast('💡 Tip: Use Space to reveal, 1-4 for difficulty, Ctrl+R for next card', 'info', 5000);
-                localStorage.setItem('flashcard_keyboard_hint', 'true');
-            }, 2000);
-        }
-    }
-    
-    showHelp() {
-        const helpText = `⌨️ Keyboard Shortcuts:
-Space - Reveal answer
-1-4 - Rate difficulty (Again, Hard, Good, Easy)
-Ctrl+R - Next card
 
-📱 Touch Gestures:
-Swipe up - Reveal answer
-Swipe left/right - Next card (after reveal)`;
-        
-        this.showToast(helpText, 'info', 8000);
-    }
-    
-    showToast(message, type = 'info', duration = 3000) {
-        const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        toast.innerHTML = `
-            <div class="toast-content">
-                <pre style="margin: 0; font-family: inherit; white-space: pre-wrap;">${message}</pre>
-            </div>
-        `;
-        
-        const colors = {
-            info: '#667eea',
-            success: '#38ef7d',
-            warning: '#f5576c',
-            error: '#fc466b'
-        };
-        
-        toast.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            max-width: 300px;
-            background: ${colors[type]};
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            font-weight: 500;
-            z-index: 10000;
-            animation: slideIn 0.3s ease;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        `;
-        
-        // Add slide-in animation
-        if (!document.querySelector('#toast-animation')) {
-            const style = document.createElement('style');
-            style.id = 'toast-animation';
-            style.textContent = `
-                @keyframes slideIn {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-            `;
-            document.head.appendChild(style);
-        }
-        
-        document.body.appendChild(toast);
-        
-        // Auto remove
-        setTimeout(() => {
-            toast.style.animation = 'slideIn 0.3s ease reverse';
-            setTimeout(() => toast.remove(), 300);
-        }, duration);
-        
-        // Click to dismiss
-        toast.addEventListener('click', () => {
-            toast.style.animation = 'slideIn 0.3s ease reverse';
-            setTimeout(() => toast.remove(), 300);
+    resetButtonsAfterError() {
+        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.classList.remove('selected');
+            if (btn.dataset.original) btn.innerHTML = btn.dataset.original;
         });
+        this.revealBtn.disabled = false;
+        this.revealBtn.innerHTML = '<i class="bi bi-eye"></i> <span>Show Answer</span>';
     }
-    
-    getCsrfToken() {
-        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
-               document.querySelector('meta[name=csrf-token]')?.content || '';
+
+    showNoMoreCardsMessage() {
+        this.flashcard.classList.remove('flipped');
+        this.reviewActions.style.display = 'none';
+        const frontFace = this.flashcard.querySelector('.flashcard-front');
+        if (frontFace) {
+            frontFace.innerHTML = `
+                <div class="word-container" style="color: white; text-align: center;">
+                    <i class="bi bi-check2-circle" style="font-size: 4rem; margin-bottom: 1rem;"></i>
+                    <h3 style="font-size: 1.5rem;">All done for now!</h3>
+                    <p>Great job clearing your reviews.</p>
+                </div>
+            `;
+        }
+    }
+
+    showError(message) {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed; bottom: 16px; left: 50%;
+            transform: translateX(-50%); padding: 10px 14px;
+            background: #e11d48; color: #fff; border-radius: 8px;
+            z-index: 9999; font-size: 14px;
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2500);
     }
 }
 
-// Initialize app when DOM is loaded
+// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     window.flashcardApp = new FlashcardApp();
 });
-
-// Utility functions for external use
-window.flashcardUtils = {
-    reveal: () => window.flashcardApp?.revealAnswer(),
-    rate: (difficulty) => window.flashcardApp?.submitReview(difficulty),
-    next: () => window.flashcardApp?.loadNextCard(),
-    help: () => window.flashcardApp?.showHelp()
-};
-
-// Performance monitoring
-if (typeof console !== 'undefined' && console.log) {
-    console.log('📚 Malayalam Flashcard App loaded successfully!');
-    console.log('🎮 Quick commands: flashcardUtils.reveal(), flashcardUtils.rate(1-4), flashcardUtils.next()');
-}
